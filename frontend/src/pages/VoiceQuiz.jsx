@@ -69,6 +69,14 @@ export const VoiceQuiz = () => {
   const recognitionRef = useRef(null);
   const synthesisRef = useRef(window.speechSynthesis);
 
+  const stepRef = useRef(step);
+  const profileDataRef = useRef(profileData);
+  
+  useEffect(() => {
+    stepRef.current = step;
+    profileDataRef.current = profileData;
+  }, [step, profileData]);
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -84,7 +92,7 @@ export const VoiceQuiz = () => {
         }
         setTranscript(currentTranscript);
         if (event.results[0].isFinal) {
-          handleFinalAnswer(currentTranscript);
+          handleFinalAnswer(currentTranscript, stepRef.current, profileDataRef.current);
         }
       };
 
@@ -106,7 +114,7 @@ export const VoiceQuiz = () => {
       if (recognitionRef.current) recognitionRef.current.stop();
       if (synthesisRef.current) synthesisRef.current.cancel();
     };
-  }, [step, profileData, hasStarted]);
+  }, [hasStarted]);
 
   // Auto-start the quiz with the first question when the user arrives
   useEffect(() => {
@@ -192,12 +200,12 @@ export const VoiceQuiz = () => {
     }
   };
 
-  const handleFinalAnswer = (text) => {
+  const handleFinalAnswer = (text, currentStep, currentProfileData) => {
     setIsListening(false);
     const cleaned = text.toLowerCase();
     
     if (cleaned.includes('skip') || cleaned.includes('no') || cleaned.includes('pass')) {
-      if (step === 2) {
+      if (currentStep === 2) {
         updateField('weight', '');
         moveToNextStep("Skipping weight.");
         return;
@@ -236,7 +244,7 @@ export const VoiceQuiz = () => {
       return `${words[Math.floor(Math.random() * words.length)]}! `;
     };
 
-    switch (step) {
+    switch (currentStep) {
       case 1:
         parsed = parseHeight(cleaned);
         if (parsed) {
@@ -343,7 +351,7 @@ export const VoiceQuiz = () => {
       case 9:
         const size = parseWordsToNumber(cleaned);
         if (size) {
-          profileData.brands.forEach(b => updateBrandSize(b, size.toString()));
+          currentProfileData.brands.forEach(b => updateBrandSize(b, size.toString()));
           acknowledgement = `${getCompliment('size', size)}Size ${size} recorded.`;
           moveToNextStep(acknowledgement);
         } else if (cleaned.includes('skip') || cleaned.includes('none')) {
