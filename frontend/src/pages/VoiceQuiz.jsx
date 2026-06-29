@@ -108,6 +108,9 @@ export const VoiceQuiz = () => {
     };
   }, [step, profileData, hasStarted]);
 
+  // Store utterance in a ref to prevent garbage collection bug in Chrome
+  const currentUtteranceRef = useRef(null);
+
   const speakQuestion = (text, isAcknowledgement = false) => {
     if (!synthesisRef.current) return;
     synthesisRef.current.cancel();
@@ -116,6 +119,8 @@ export const VoiceQuiz = () => {
     setCaption(text);
     
     const utterance = new SpeechSynthesisUtterance(text);
+    currentUtteranceRef.current = utterance; // Keep a reference
+    
     const voices = synthesisRef.current.getVoices();
     const goodVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Female')) || voices[0];
     if (goodVoice) utterance.voice = goodVoice;
@@ -125,6 +130,11 @@ export const VoiceQuiz = () => {
       if (!isAcknowledgement) {
         startListening();
       }
+    };
+
+    utterance.onerror = (e) => {
+      console.error("Speech synthesis error", e);
+      setIsSpeaking(false);
     };
     
     synthesisRef.current.speak(utterance);
@@ -317,6 +327,8 @@ export const VoiceQuiz = () => {
     setCaption(acknowledgementText);
     
     const u = new SpeechSynthesisUtterance(acknowledgementText);
+    currentUtteranceRef.current = u; // Keep a reference
+    
     u.onend = () => {
       if (step < 10) {
         setStep(prev => prev + 1);
@@ -328,6 +340,11 @@ export const VoiceQuiz = () => {
         }, 3000);
       }
     };
+    
+    u.onerror = (e) => {
+      console.error("Speech synthesis error", e);
+    };
+
     synthesisRef.current.speak(u);
   };
 
