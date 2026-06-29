@@ -131,6 +131,14 @@ export const VoiceQuiz = () => {
   // Store utterance in a ref to prevent garbage collection bug in Chrome
   const currentUtteranceRef = useRef(null);
 
+  const getIndianVoice = () => {
+    const voices = synthesisRef.current.getVoices();
+    return voices.find(v => (v.lang === 'en-IN' || v.name.toLowerCase().includes('india')) && v.name.includes('Female'))
+        || voices.find(v => v.lang === 'en-IN' || v.name.toLowerCase().includes('india'))
+        || voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Female'))
+        || voices[0];
+  };
+
   const speakQuestion = (text, isAcknowledgement = false) => {
     if (!synthesisRef.current) return;
     synthesisRef.current.cancel();
@@ -141,9 +149,8 @@ export const VoiceQuiz = () => {
     const utterance = new SpeechSynthesisUtterance(text);
     currentUtteranceRef.current = utterance; // Keep a reference
     
-    const voices = synthesisRef.current.getVoices();
-    const goodVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Female')) || voices[0];
-    if (goodVoice) utterance.voice = goodVoice;
+    const indianVoice = getIndianVoice();
+    if (indianVoice) utterance.voice = indianVoice;
     
     utterance.onend = () => {
       setIsSpeaking(false);
@@ -395,9 +402,8 @@ export const VoiceQuiz = () => {
     const u = new SpeechSynthesisUtterance(combinedText);
     currentUtteranceRef.current = u; // Keep a reference
     
-    const voices = synthesisRef.current.getVoices();
-    const goodVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Female')) || voices[0];
-    if (goodVoice) u.voice = goodVoice;
+    const indianVoice = getIndianVoice();
+    if (indianVoice) u.voice = indianVoice;
     
     u.onend = () => {
       setIsSpeaking(false);
