@@ -108,13 +108,14 @@ export const VoiceQuiz = () => {
     };
   }, [step, profileData, hasStarted]);
 
-  // Auto-play the welcome message when the user arrives on the page
+  // Auto-start the quiz with the first question when the user arrives
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasStarted) {
-        speakQuestion('Press start to begin your conversational fitting.', true);
+        setHasStarted(true);
+        askQuestionForStep(1);
       }
-    }, 600); // Slight delay gives the browser time to load voices
+    }, 600);
     
     return () => clearTimeout(timer);
   }, []);
