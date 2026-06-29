@@ -108,6 +108,17 @@ export const VoiceQuiz = () => {
     };
   }, [step, profileData, hasStarted]);
 
+  // Auto-play the welcome message when the user arrives on the page
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasStarted) {
+        speakQuestion('Press start to begin your conversational fitting.', true);
+      }
+    }, 600); // Slight delay gives the browser time to load voices
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Store utterance in a ref to prevent garbage collection bug in Chrome
   const currentUtteranceRef = useRef(null);
 
