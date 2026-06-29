@@ -373,17 +373,30 @@ export const VoiceQuiz = () => {
 
   const moveToNextStep = (acknowledgementText) => {
     synthesisRef.current.cancel();
-    setCaption(acknowledgementText);
     
-    const u = new SpeechSynthesisUtterance(acknowledgementText);
+    let combinedText = acknowledgementText;
+    if (step < 10) {
+      combinedText += " " + getQuestionText(step + 1);
+    } else {
+      combinedText += " Thank you! Generating your perfect fit recommendations now.";
+    }
+
+    setIsSpeaking(true);
+    setCaption(combinedText);
+    
+    const u = new SpeechSynthesisUtterance(combinedText);
     currentUtteranceRef.current = u; // Keep a reference
     
+    const voices = synthesisRef.current.getVoices();
+    const goodVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Female')) || voices[0];
+    if (goodVoice) u.voice = goodVoice;
+    
     u.onend = () => {
+      setIsSpeaking(false);
       if (step < 10) {
         setStep(prev => prev + 1);
-        askQuestionForStep(step + 1);
+        startListening(); // Immediately start listening after asking the next question
       } else {
-        speakQuestion("Thank you! Generating your perfect fit recommendations now.", true);
         setTimeout(() => {
           navigate('/completion');
         }, 3000);
@@ -392,6 +405,7 @@ export const VoiceQuiz = () => {
     
     u.onerror = (e) => {
       console.error("Speech synthesis error", e);
+      setIsSpeaking(false);
     };
 
     synthesisRef.current.speak(u);
