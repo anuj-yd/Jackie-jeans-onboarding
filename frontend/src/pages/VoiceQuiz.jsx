@@ -207,12 +207,41 @@ export const VoiceQuiz = () => {
     let parsed = null;
     let acknowledgement = "";
 
+    // Dynamic compliment generator
+    const getCompliment = (type, value) => {
+      const v = (value || '').toString().toLowerCase();
+      if (type === 'waistFit') {
+        if (v.includes('snug')) return 'A snug waist gives a beautiful tailored look. ';
+        if (v.includes('slightly')) return 'Slightly relaxed is the perfect balance of comfort and style. ';
+        if (v.includes('relax')) return 'A relaxed waist is perfect for ultimate everyday comfort. ';
+      }
+      if (type === 'waistband') {
+        if (v.includes('high')) return 'High rise is so flattering and trendy right now! ';
+        if (v.includes('mid')) return 'Mid rise is such a timeless and classic choice. ';
+        if (v.includes('low')) return 'Low rise brings a really cool, vintage vibe! ';
+      }
+      if (type === 'thighFit') {
+        if (v.includes('fitted')) return 'Fitted thighs really highlight your silhouette nicely. ';
+        if (v.includes('relax')) return 'Relaxed thighs give you that perfect effortless look. ';
+        if (v.includes('loose')) return 'Loose fit is incredibly stylish and comfortable! ';
+      }
+      if (type === 'frustration') {
+        if (v.includes('gap')) return "We completely understand, waist gaps are the worst! ";
+        if (v.includes('tight')) return "Hip tightness is so uncomfortable, we've got you covered! ";
+        if (v.includes('length')) return "Getting the right length is tricky, but we'll sort it out! ";
+        return "Got it. We'll make sure to find a fit that avoids that completely! ";
+      }
+      
+      const words = ['Awesome', 'Perfect', 'Excellent', 'Wonderful', 'Great'];
+      return `${words[Math.floor(Math.random() * words.length)]}! `;
+    };
+
     switch (step) {
       case 1:
         parsed = parseHeight(cleaned);
         if (parsed) {
           updateField('height', parsed);
-          acknowledgement = `Awesome! ${parsed.replace("'", " foot ").replace('"', " inches")} is a great height.`;
+          acknowledgement = `${getCompliment('height', parsed)}Your height is recorded as ${parsed.replace("'", " foot ").replace('"', " inches")}.`;
           moveToNextStep(acknowledgement);
         } else {
           speakQuestion("I didn't quite catch that. Please state your height like, five foot six.");
@@ -223,7 +252,7 @@ export const VoiceQuiz = () => {
         const num = parseWordsToNumber(cleaned);
         if (num) {
           updateField('weight', num);
-          acknowledgement = `Perfect, got it! ${num}.`;
+          acknowledgement = `${getCompliment('weight', num)}Your weight is ${num}.`;
           moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Please state your weight as a number, or say skip.");
@@ -234,7 +263,8 @@ export const VoiceQuiz = () => {
         const waist = parseWordsToNumber(cleaned);
         if (waist && waist >= 20 && waist <= 60) {
           updateField('waist', `${waist}"`);
-          moveToNextStep(`Excellent. Waist ${waist}.`);
+          acknowledgement = `${getCompliment('waist', waist)}Waist ${waist}.`;
+          moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Please state a number between 24 and 52.");
         }
@@ -244,7 +274,8 @@ export const VoiceQuiz = () => {
         const hip = parseWordsToNumber(cleaned);
         if (hip && hip >= 20 && hip <= 70) {
           updateField('hip', `${hip}"`);
-          moveToNextStep(`Wonderful! Hip ${hip}.`);
+          acknowledgement = `${getCompliment('hip', hip)}Hip ${hip}.`;
+          moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Please state a number between 32 and 60.");
         }
@@ -257,7 +288,8 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('waistFit', parsed);
-          moveToNextStep(`Love it! ${parsed} waist is a great look.`);
+          acknowledgement = `${getCompliment('waistFit', parsed)}`;
+          moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Say snug, slightly relaxed, or relaxed.");
         }
@@ -270,7 +302,8 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('waistband', parsed);
-          moveToNextStep(`Great choice, ${parsed} it is.`);
+          acknowledgement = `${getCompliment('waistband', parsed)}`;
+          moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Say high rise, mid rise, or low rise.");
         }
@@ -283,7 +316,8 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('thighFit', parsed);
-          moveToNextStep(`Sounds super comfortable! ${parsed} thighs.`);
+          acknowledgement = `${getCompliment('thighFit', parsed)}`;
+          moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Say fitted, relaxed, or loose.");
         }
@@ -297,7 +331,8 @@ export const VoiceQuiz = () => {
         
         if (selected.length > 0) {
           updateField('brands', selected);
-          moveToNextStep(`Nice taste! I heard ${selected.join(" and ")}.`);
+          acknowledgement = `Nice taste in brands! I heard ${selected.join(" and ")}.`;
+          moveToNextStep(acknowledgement);
         } else if (cleaned.includes('none') || cleaned.includes('skip')) {
           moveToNextStep("No brands selected.");
         } else {
@@ -309,7 +344,8 @@ export const VoiceQuiz = () => {
         const size = parseWordsToNumber(cleaned);
         if (size) {
           profileData.brands.forEach(b => updateBrandSize(b, size.toString()));
-          moveToNextStep(`Perfect, size ${size} recorded.`);
+          acknowledgement = `${getCompliment('size', size)}Size ${size} recorded.`;
+          moveToNextStep(acknowledgement);
         } else if (cleaned.includes('skip') || cleaned.includes('none')) {
           moveToNextStep("Skipping sizes.");
         } else {
@@ -326,7 +362,8 @@ export const VoiceQuiz = () => {
         else { parsed = 'Other'; } 
         
         updateField('frustration', parsed);
-        moveToNextStep(`Got it! We will definitely find jeans that fix that ${parsed.toLowerCase()} for you!`);
+        acknowledgement = `${getCompliment('frustration', parsed)}`;
+        moveToNextStep(acknowledgement);
         break;
 
       default:
