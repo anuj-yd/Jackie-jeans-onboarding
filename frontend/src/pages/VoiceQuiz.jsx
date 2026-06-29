@@ -212,7 +212,7 @@ export const VoiceQuiz = () => {
         parsed = parseHeight(cleaned);
         if (parsed) {
           updateField('height', parsed);
-          acknowledgement = `Great, ${parsed.replace("'", " foot ").replace('"', " inches")}.`;
+          acknowledgement = `Awesome! ${parsed.replace("'", " foot ").replace('"', " inches")} is a great height.`;
           moveToNextStep(acknowledgement);
         } else {
           speakQuestion("I didn't quite catch that. Please state your height like, five foot six.");
@@ -223,7 +223,7 @@ export const VoiceQuiz = () => {
         const num = parseWordsToNumber(cleaned);
         if (num) {
           updateField('weight', num);
-          acknowledgement = `Got it, ${num}.`;
+          acknowledgement = `Perfect, got it! ${num}.`;
           moveToNextStep(acknowledgement);
         } else {
           speakQuestion("Please state your weight as a number, or say skip.");
@@ -234,7 +234,7 @@ export const VoiceQuiz = () => {
         const waist = parseWordsToNumber(cleaned);
         if (waist && waist >= 20 && waist <= 60) {
           updateField('waist', `${waist}"`);
-          moveToNextStep(`Waist ${waist}.`);
+          moveToNextStep(`Excellent. Waist ${waist}.`);
         } else {
           speakQuestion("Please state a number between 24 and 52.");
         }
@@ -244,7 +244,7 @@ export const VoiceQuiz = () => {
         const hip = parseWordsToNumber(cleaned);
         if (hip && hip >= 20 && hip <= 70) {
           updateField('hip', `${hip}"`);
-          moveToNextStep(`Hip ${hip}.`);
+          moveToNextStep(`Wonderful! Hip ${hip}.`);
         } else {
           speakQuestion("Please state a number between 32 and 60.");
         }
@@ -257,7 +257,7 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('waistFit', parsed);
-          moveToNextStep(`Okay, ${parsed} waist.`);
+          moveToNextStep(`Love it! ${parsed} waist is a great look.`);
         } else {
           speakQuestion("Say snug, slightly relaxed, or relaxed.");
         }
@@ -270,7 +270,7 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('waistband', parsed);
-          moveToNextStep(`${parsed} it is.`);
+          moveToNextStep(`Great choice, ${parsed} it is.`);
         } else {
           speakQuestion("Say high rise, mid rise, or low rise.");
         }
@@ -283,7 +283,7 @@ export const VoiceQuiz = () => {
         
         if (parsed) {
           updateField('thighFit', parsed);
-          moveToNextStep(`Got it, ${parsed} thighs.`);
+          moveToNextStep(`Sounds super comfortable! ${parsed} thighs.`);
         } else {
           speakQuestion("Say fitted, relaxed, or loose.");
         }
@@ -297,7 +297,7 @@ export const VoiceQuiz = () => {
         
         if (selected.length > 0) {
           updateField('brands', selected);
-          moveToNextStep(`I heard ${selected.join(" and ")}.`);
+          moveToNextStep(`Nice taste! I heard ${selected.join(" and ")}.`);
         } else if (cleaned.includes('none') || cleaned.includes('skip')) {
           moveToNextStep("No brands selected.");
         } else {
@@ -309,7 +309,7 @@ export const VoiceQuiz = () => {
         const size = parseWordsToNumber(cleaned);
         if (size) {
           profileData.brands.forEach(b => updateBrandSize(b, size.toString()));
-          moveToNextStep(`Size ${size} recorded.`);
+          moveToNextStep(`Perfect, size ${size} recorded.`);
         } else if (cleaned.includes('skip') || cleaned.includes('none')) {
           moveToNextStep("Skipping sizes.");
         } else {
@@ -326,7 +326,7 @@ export const VoiceQuiz = () => {
         else { parsed = 'Other'; } 
         
         updateField('frustration', parsed);
-        moveToNextStep(`Okay, noted.`);
+        moveToNextStep(`Got it! We will definitely find jeans that fix that ${parsed.toLowerCase()} for you!`);
         break;
 
       default:
